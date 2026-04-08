@@ -1,43 +1,26 @@
-import streamlit as st
 import pandas as pd
-import analysis
+from ydata_profiling import ProfileReport
+import sweetviz as sv
 import os
 
-st.set_page_config(page_title="Climate Data Explorer", layout="wide")
+def load_data(file):
+    df = pd.read_csv(file)
+    return df
 
-st.title("🌍 Climate Change Data Explorer")
+def basic_info(df):
+    info = {
+        "shape": df.shape,
+        "columns": df.columns.tolist(),
+        "missing": df.isnull().sum()
+    }
+    return info
 
-uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
+def generate_profile_report(df, output_file="profile_report.html"):
+    profile = ProfileReport(df, title="ONI Report", explorative=True)
+    profile.to_file(output_file)
+    return output_file
 
-if uploaded_file:
-    df = analysis.load_data(uploaded_file)
-
-    # Preview
-    st.subheader("📊 Data Preview")
-    st.dataframe(df.head())
-
-    # Info
-    st.subheader("ℹ️ Dataset Info")
-    info = analysis.basic_info(df)
-
-    st.write(f"Shape: {info['shape']}")
-    st.write("Columns:", info['columns'])
-
-    st.subheader("❗ Missing Values")
-    st.write(info['missing'])
-
-    # Generate reports
-    if st.button("Generate Profiling Report"):
-        with st.spinner("Generating report..."):
-            profile_path = analysis.generate_profile_report(df)
-            with open(profile_path, "rb") as f:
-                st.download_button("Download Profile Report", f, file_name="profile_report.html")
-
-    if st.button("Generate Sweetviz Report"):
-        with st.spinner("Generating report..."):
-            sweetviz_path = analysis.generate_sweetviz_report(df)
-            with open(sweetviz_path, "rb") as f:
-                st.download_button("Download Sweetviz Report", f, file_name="sweetviz_report.html")
-
-else:
-    st.info("Please upload a CSV file to begin.")
+def generate_sweetviz_report(df, output_file="sweetviz_report.html"):
+    report = sv.analyze(df)
+    report.show_html(output_file)
+    return output_file
