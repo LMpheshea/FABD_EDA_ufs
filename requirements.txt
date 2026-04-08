@@ -1,1 +1,7 @@
 streamlit
+pandas
+numpy
+ydata-profiling
+sweetviz
+matplotlib
+seaborn
