@@ -1,5 +1,3 @@
-import pandas as pd
-import sweetviz as sv
 import streamlit as st
 import analysis
 import streamlit.components.v1 as components
